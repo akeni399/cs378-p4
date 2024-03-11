@@ -4,6 +4,7 @@ const SearchBar = ({ onSearch }) => {
 
     const [images, setImages] = useState([]);
     const [searchTerm, setSearchTerm] = useState('')
+    const [error, setError] = useState(null);
 
     const handleChange = (event) => {
         setSearchTerm(event.target.value);
@@ -16,12 +17,25 @@ const SearchBar = ({ onSearch }) => {
 
     const fetchImage = (keywords) => {
         fetch(`https://images-api.nasa.gov/search?q=${keywords}`)
-            .then(response => response.json())
+            .then(response => {
+                if(!response.ok) {
+                    throw new Error('Failed to fetch');
+                }
+                return response.json();
+            })
             .then(data=> {
                 const items = data.collection.items.slice(0,10);
-                setImages(items);
+                if(items.length===0) {
+                    setError('No results found:(');
+                } else {
+                    setImages(items);
+                    setError(null)
+                }
             })
-            .catch(error => console.error(error))
+            .catch(error => {
+                console.error(error);
+                setError('Failed to fetch data');
+            });
     }
 
     return (
@@ -33,15 +47,16 @@ const SearchBar = ({ onSearch }) => {
             value={searchTerm}
             onChange={handleChange}
         />
-        <button type="submit">Search</button>
+        <button className="btn-search" type="submit">Search</button>
         </form>
+        {error && <p>{error}</p>}
         <div className="image-container">
                 {images.map((image, index) => (
                 <div key={index} className="image-item">
                     <img src={image.links[0].href} alt={image.data[0].title} />
                     <div className="image-info">
-                    <h2>{image.data[0].title}</h2>
-                    <p>{image.data[0].description}</p>
+                    <h2 className="title">{image.data[0].title}</h2>
+                    <p className="description">{image.data[0].description}</p>
                     </div>
                 </div>
                 ))}
