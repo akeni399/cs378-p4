@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+.row {
+  display: 'flex',
+}
+
+.btnn {
+  margin: 25px;
+}
+
+.searchbar {
+  margin: 10px;
+}
+
+.image {
+  height: 200px;
+  width: 300px;
+}
